@@ -381,9 +381,9 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
       else //data victim cache defined
 	{
 
-	      if(sscanf(cache_victim_d_opt, "%[^:]:%d:%d:%c",
-			name, &bsize, &assoc, &c) != 4)
-		fatal("bad l1 data victim cache parms: <name>:<bsize>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
+	      if(sscanf(cache_victim_d_opt, "%[^:]:%d:%c", //removed bsize so now taking from l1
+			name, &assoc, &c) != 4)
+		fatal("bad l1 data victim cache parms: <name>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
 	      cache_victim_d = cache_create(name, 1, bsize, /*balloc*/FALSE,
 					    /*usize*/0, assoc, cache_char2policy(c),
 					    vc_d_access_fn, /*hit latency*/0);
@@ -454,9 +454,9 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
       else //instruction victim cache defined
 	{
 
-	      if(sscanf(cache_victim_i_opt, "%[^:]:%d:%d:%c",
-			name, &bsize, &assoc, &c) != 4)
-		fatal("bad l1 instruction victim cache parms: <name>:<bsize>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
+	      if(sscanf(cache_victim_i_opt, "%[^:]:%d:%c", //removed bsize and taking from l1
+			name, &assoc, &c) != 4)
+		fatal("bad l1 instruction victim cache parms: <name>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
 	      cache_victim_i = cache_create(name, 1, bsize, /*balloc*/FALSE,
 					    /*usize*/0, assoc, cache_char2policy(c),
 					    vc_i_access_fn, /*hit latency*/0);
