@@ -104,6 +104,12 @@ static struct cache_t *itlb = NULL;
 /* data TLB */
 static struct cache_t *dtlb = NULL;
 
+/* data victim cache */
+static struct cache_t *cache_victim_d = NULL; //ADDED FOR VICTIM
+
+/* instruction victim cache */
+static struct cache_t *cache_victim_i = NULL; //ADDED FOR VICTIM
+
 /* text-based stat profiles */
 #define MAX_PCSTAT_VARS 8
 static struct stat_stat_t *pcstat_stats[MAX_PCSTAT_VARS];
@@ -233,6 +239,8 @@ static char *cache_il1_opt /* = "none" */;
 static char *cache_il2_opt /* = "none" */;
 static char *itlb_opt /* = "none" */;
 static char *dtlb_opt /* = "none" */;
+static char *cache_victim_d_opt /* = "none" */; //ADDED FOR VICTIM
+static char *cache_victim_i_opt /* = "none" */; //ADDED FOR VICTIM
 static int flush_on_syscalls /* = FALSE */;
 static int compress_icache_addrs /* = FALSE */;
 
@@ -307,6 +315,17 @@ sim_reg_options(struct opt_odb_t *odb)	/* options database */
   opt_reg_string(odb, "-cache:il2",
 		 "l2 instruction cache config, i.e., {<config>|dl2|none}",
 		 &cache_il2_opt, "dl2", /* print */TRUE, NULL);
+
+  //ADDED FOR VICTIM
+  opt_reg_string(odb, "-cache:vc_d",
+		 "data victim cache config, i.e., {<config>|none}",
+		 &cache_victim_d_opt, "vc_d:32:8:l", /* print */ TRUE, NULL);
+
+  opt_reg_string(odb, "-cache:vc_i",
+		 "instruction victim cache config, i.e., {<config>|none}",
+		 &cache_victim_i_opt, "vc_d:32:8:l", /* print */ TRUE, NULL);
+
+
   opt_reg_string(odb, "-tlb:itlb",
 		 "instruction TLB config, i.e., {<config>|none}",
 		 &itlb_opt, "itlb:16:4096:4:l", /* print */TRUE, NULL);
@@ -353,6 +372,23 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
       cache_dl1 = cache_create(name, nsets, bsize, /* balloc */FALSE,
 			       /* usize */0, assoc, cache_char2policy(c),
 			       dl1_access_fn, /* hit latency */1);
+      
+      //ADDED FOR VICTIM
+      if(!mystricmp(cache_victim_d_opt, "none"))
+	{
+	      cache_victim_d = NULL;
+	}
+      else //data victim cache defined
+	{
+
+	      if(sscanf(cache_victim_d_opt, "%[^:]:%d:%d:%c",
+			name, &bsize, &assoc, &c) != 4)
+		fatal("bad l1 data victim cache parms: <name>:<bsize>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
+	      cache_victim_d = cache_create(name, 1, bsize, /*balloc*/FALSE,
+					    /*usize*/0, assoc, cache_char2policy(c),
+					    vc_d_access_fn, /*hit latency*/0);
+	}
+
 
       /* is the level 2 D-cache defined? */
       if (!mystricmp(cache_dl2_opt, "none"))
@@ -409,6 +445,26 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
       cache_il1 = cache_create(name, nsets, bsize, /* balloc */FALSE,
 			       /* usize */0, assoc, cache_char2policy(c),
 			       il1_access_fn, /* hit latency */1);
+
+      //ADDED FOR VICTIM
+      if(!mystricmp(cache_victim_i_opt, "none"))
+	{
+	      cache_victim_i = NULL;
+	}
+      else //instruction victim cache defined
+	{
+
+	      if(sscanf(cache_victim_i_opt, "%[^:]:%d:%d:%c",
+			name, &bsize, &assoc, &c) != 4)
+		fatal("bad l1 instruction victim cache parms: <name>:<bsize>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
+	      cache_victim_i = cache_create(name, 1, bsize, /*balloc*/FALSE,
+					    /*usize*/0, assoc, cache_char2policy(c),
+					    vc_i_access_fn, /*hit latency*/0);
+	}
+
+
+
+
 
       /* is the level 2 D-cache defined? */
       if (!mystricmp(cache_il2_opt, "none"))
@@ -543,6 +599,12 @@ sim_reg_stats(struct stat_sdb_t *sdb)	/* stats database */
     cache_reg_stats(itlb, sdb);
   if (dtlb)
     cache_reg_stats(dtlb, sdb);
+  //ADDED FOR VICTIM
+  if(cache_victim_d)
+    cache_reg_stats(cache_victim_d, sdb);
+  if(cache_victim_i)
+    cache_reg_stats(cache_victim_i, sdb);
+
 
   for (i=0; i<pcstat_nelt; i++)
     {
