@@ -134,6 +134,24 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 	      struct cache_blk_t *blk,	/* ptr to block in upper level */
 	      tick_t now)		/* time of access */
 {
+
+  //ADDED FOR VICTIM
+  if(cache_victim_d){
+	if(cache_dl1->last_blk_addr != 0){
+		if(cache_probe(cache_victim_d,baddr) != 0){ //if hit in cache_victim_d
+			cache_victim_d->hits++;
+			//If hit in victim cache, remove blk from victim and put in dl1
+			cache_flush_addr(cache_victim_d, baddr, now);
+			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
+			return 0;
+		}
+		else{
+			cache_victim_d->misses++;
+			//SOMETHING HERE? For victim thrown out from dl1?
+		}
+	}
+  }
+
   if (cache_dl2)
     {
       /* access next level of data cache hierarchy */
@@ -146,6 +164,19 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
       return /* access latency, ignored */1;
     }
 }
+
+
+//ADDED FOR VICTIM
+//Misses in victim cache handled in dl1_access_fn
+static unsigned int			/* latency of block access */
+vc_d_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
+              md_addr_t baddr,		/* block address to access */
+              int bsize,		/* size of block to access */
+              struct cache_blk_t *blk,	/* ptr to block in upper level */
+              tick_t now){		/* time of access */
+              return 0;
+              }
+
 
 /* l2 data cache block miss handler function */
 static unsigned int			/* latency of block access */
