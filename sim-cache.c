@@ -348,13 +348,14 @@ sim_reg_options(struct opt_odb_t *odb)	/* options database */
 		 &cache_il2_opt, "dl2", /* print */TRUE, NULL);
 
   //ADDED FOR VICTIM
+  //<name>:<assoc>:<repl>
   opt_reg_string(odb, "-cache:vc_d",
 		 "data victim cache config, i.e., {<config>|none}",
-		 &cache_victim_d_opt, "vc_d:32:8:l", /* print */ TRUE, NULL);
+		 &cache_victim_d_opt, "vc_d:32:l", /* print */ TRUE, NULL);
 
   opt_reg_string(odb, "-cache:vc_i",
 		 "instruction victim cache config, i.e., {<config>|none}",
-		 &cache_victim_i_opt, "vc_d:32:8:l", /* print */ TRUE, NULL);
+		 &cache_victim_i_opt, "vc_d:32:l", /* print */ TRUE, NULL);
 
 
   opt_reg_string(odb, "-tlb:itlb",
@@ -412,8 +413,8 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
       else //data victim cache defined
 	{
 
-	      if(sscanf(cache_victim_d_opt, "%[^:]:%d:%c", //removed bsize so now taking from l1
-			name, &assoc, &c) != 4)
+	      if(sscanf(cache_victim_d_opt, "%[^:]:%d:%c", //removed bsize so now taking from d1
+			name, &assoc, &c) != 3)
 		fatal("bad l1 data victim cache parms: <name>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
 	      cache_victim_d = cache_create(name, 1, bsize, /*balloc*/FALSE,
 					    /*usize*/0, assoc, cache_char2policy(c),
@@ -486,7 +487,7 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
 	{
 
 	      if(sscanf(cache_victim_i_opt, "%[^:]:%d:%c", //removed bsize and taking from l1
-			name, &assoc, &c) != 4)
+			name, &assoc, &c) != 3)
 		fatal("bad l1 instruction victim cache parms: <name>:<assoc>:<repl>"); //ACCESS FUNCTION NEED TO CREATE
 	      cache_victim_i = cache_create(name, 1, bsize, /*balloc*/FALSE,
 					    /*usize*/0, assoc, cache_char2policy(c),
