@@ -137,17 +137,21 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 
   //ADDED FOR VICTIM
   if(cache_victim_d){
-	if(cache_dl1->last_blk_addr != 0){
+	if(cache_dl1->last_blk_addr != 0){ //if missed set in L1 was not empty 
 		if(cache_probe(cache_victim_d,baddr) != 0){ //if hit in cache_victim_d
 			cache_victim_d->hits++;
 			//If hit in victim cache, remove blk from victim and put in dl1
-			cache_flush_addr(cache_victim_d, baddr, now);
-			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
+			cache_flush_addr(cache_victim_d, baddr, now); //remove from victim
+			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL); //swap dl1 block into victim
+			cache_access(cache_dl1, write, baddr, NULL, bsize, now, NULL, NULL); //swap victim block back into dl1 
 			return 0;
 		}
 		else{
 			cache_victim_d->misses++;
 			//SOMETHING HERE? For victim thrown out from dl1?
+
+			// If miss in L1 and miss in victim, then evict dl1 block into victim, potentially kicking something out if victim is full
+			// Then let dl2 fill evicted spot in dl1 
 		}
 	}
   }
