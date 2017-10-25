@@ -139,7 +139,7 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
   if(cache_victim_d){
 	//puts("REACHED VC_D OUTER LOOP");
 	if(cache_dl1->last_blk_addr != 0){
-		puts("REACHED VC_D INNNER LOOP");
+		//puts("REACHED VC_D INNNER LOOP");
 		if(cache_probe(cache_victim_d,baddr) == TRUE){ //if hit in cache_victim_d
 			// Increment vdl1 hits
 			cache_victim_d->hits++;
@@ -466,10 +466,6 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
 					    /*usize*/0, assoc, cache_char2policy(c),
 					    vc_d_access_fn, /*hit latency*/0);
 
-		if(cache_victim_d)
-			puts("YAY VC_D WAS MADE YES YES YES YES\n");
-		else
-			puts("VC_D WAS NOT MADE BOOOOOOOOOOOOOO\n");
 	}
 
 
@@ -544,10 +540,6 @@ sim_check_options(struct opt_odb_t *odb,	/* options database */
 					    /*usize*/0, assoc, cache_char2policy(c),
 					    vc_i_access_fn, /*hit latency*/0);
 
-		if(cache_victim_i)
-			puts("YAY VC_I WAS MADE YES YES YES YES\n");
-		else
-			puts("VC_I WAS NOT MADE BOOOOOOOOOOOOOO\n");
 	}
 
 
