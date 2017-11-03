@@ -147,12 +147,14 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 			cache_flush_addr(cache_victim_d, baddr, now); 
 			// Write evicted dl1 block to vdl1 block address just vacated
 			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
+			cache_victim_d->misses--; //don't want to count block swap as a miss
 			// Write requested block from vdl1 to dl1
 			cache_access(cache_dl1, Write, baddr, NULL, bsize, now, NULL, NULL); 
+			//cache_dl1->misses--; //don't want to count block swap as a miss
 			return 0;
 		}
 		else{
-			cache_victim_d->misses++;
+			//cache_victim_d->misses++;
 			//Write block that will be evicted from dl1 to vdl1
 			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
 
@@ -230,12 +232,13 @@ il1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 			cache_flush_addr(cache_victim_i, baddr, now); 
 			// Write evicted il1 block to vil1 block address just vacated
 			cache_access(cache_victim_i, Write, cache_il1->last_blk_addr, NULL, bsize, now, NULL, NULL);
+			cache_victim_i->misses--; //don't want to count block swap as a miss
 			// Write requested block from vil1 to il1
 			cache_access(cache_il1, Write, baddr, NULL, bsize, now, NULL, NULL); 
 			return 0;
 		}
 		else{
-			cache_victim_i->misses++;
+			//cache_victim_i->misses++;
 			//Write block that will be evicted from il1 to vil1
 			cache_access(cache_victim_i, Write, cache_il1->last_blk_addr, NULL, bsize, now, NULL, NULL);
 
