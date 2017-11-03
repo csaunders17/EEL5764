@@ -137,22 +137,23 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 
   //ADDED FOR VICTIM
   if(cache_victim_d){
-	if(cache_probe(cache_victim_d,baddr) == TRUE){ //if hit in cache_victim_d
-		// Increment vdl1 hits
-		cache_victim_d->hits++;
-		// Remove requested block from vdl1
-		cache_flush_addr(cache_victim_d, baddr, now); 
-		// Write evicted dl1 block to vdl1 block address just vacated
-		cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
-		// Write requested block from vdl1 to dl1
-		cache_access(cache_dl1, Write, baddr, NULL, bsize, now, NULL, NULL); 
-		return 0;
-	}
-	else{
-		cache_victim_d->misses++;
-		//Write block that will be evicted from dl1 to vdl1
-		cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
-
+	if(cache_dl1->last_blk_addr != 0){ //if missed set in L1 was not empty
+		if(cache_probe(cache_victim_d,baddr) == TRUE){ //if hit in cache_victim_d
+			// Increment vdl1 hits
+			cache_victim_d->hits++;
+			// Remove requested block from vdl1
+			cache_flush_addr(cache_victim_d, baddr, now); 
+			// Write evicted dl1 block to vdl1 block address just vacated
+			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
+			// Write requested block from vdl1 to dl1
+			cache_access(cache_dl1, Write, baddr, NULL, bsize, now, NULL, NULL); 
+			return 0;
+		}
+		else{
+			cache_victim_d->misses++;
+			//Write block that will be evicted from dl1 to vdl1
+			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
+		}
 	}
   }
 
