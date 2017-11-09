@@ -9,3 +9,5 @@ TO DO:
 4. Translate hit/miss rates to AMAT based on real access times 
 5. Analyze/visualize data
 6. Write paper (all)
+
+Due 11/30 for full 15% extra credit. 
