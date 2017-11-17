@@ -148,6 +148,7 @@ dl1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 			// Write evicted dl1 block to vdl1 block address just vacated
 			cache_access(cache_victim_d, Write, cache_dl1->last_blk_addr, NULL, bsize, now, NULL, NULL);
 			cache_victim_d->misses--; //don't want to count block swap as a miss
+			cache_victim_d->misses--; //compensating for additional l1_miss that will be counted when writing block to l1
 			// Write requested block from vdl1 to dl1
 			cache_access(cache_dl1, Write, baddr, NULL, bsize, now, NULL, NULL); 
 			//cache_dl1->misses--; //don't want to count block swap as a miss
@@ -233,6 +234,7 @@ il1_access_fn(enum mem_cmd cmd,		/* access cmd, Read or Write */
 			// Write evicted il1 block to vil1 block address just vacated
 			cache_access(cache_victim_i, Write, cache_il1->last_blk_addr, NULL, bsize, now, NULL, NULL);
 			cache_victim_i->misses--; //don't want to count block swap as a miss
+			cache_victim_d->misses--; //compensating for additional l1_miss that will be counted when writing block to l1
 			// Write requested block from vil1 to il1
 			cache_access(cache_il1, Write, baddr, NULL, bsize, now, NULL, NULL); 
 			return 0;
